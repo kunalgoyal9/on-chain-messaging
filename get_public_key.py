@@ -62,8 +62,7 @@ if __name__ == "__main__":
     
     
     # 2. choose some tx from this list and request it with web3.eth.getTransaction
-    tx = w3.eth.getTransaction('0x5ee0eb7a8e867c72752e9965904b5bd71e023b83c6a0506a0ddbc91502316995')
-    print("tx: ", tx)
+    tx = w3.eth.getTransaction('0x4bbcb8d59b9be67508be65943c5a798efb2ae9c976a12c163558ae1787191dc7')
     
     # 3. compose valid signature from its r, s and v fields (convert v to [0..3] interval)
     s = w3.eth.account._keys.Signature(vrs=(
@@ -72,14 +71,10 @@ if __name__ == "__main__":
                                         w3.toInt(tx.s)
                                         ))
                                         
-    print("signature: ", s)
-    
     # 4. use recover to recover public key from signature and tx hash
     tt = {k:tx[k] for k in ALLOWED_TRANSACTION_KEYS - {'chainId', 'data'}}
     tt['data']=tx.input
-    tt['chainId']=extract_chain_id(chain_id)[0]
-    
-    print("tt: ", tt)
+    tt['chainId']=chain_id
     
     ut = serializable_unsigned_transaction_from_dict(tt)
     print("public key: ", s.recover_public_key_from_msg_hash(ut.hash()))
