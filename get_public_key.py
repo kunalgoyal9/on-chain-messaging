@@ -1,20 +1,8 @@
-from curses import raw
-from inspect import signature
-from itertools import chain
-from sys import byteorder
-from time import time
-from sqlalchemy import null
-import web3
-from eth_utils import decode_hex, encode_hex
 import requests
-from eth_keys import keys
-from eth_account.messages import encode_defunct
-import ethereum
-
-from eth_keys import KeyAPI
-from eth_keys.backends import NativeECCBackend
-
-keyAPI = KeyAPI(backend=NativeECCBackend())
+from eth_account._utils.legacy_transactions import ALLOWED_TRANSACTION_KEYS
+from eth_account._utils.signing import extract_chain_id, to_standard_v
+from eth_account._utils.legacy_transactions import serializable_unsigned_transaction_from_dict
+import web3
 
 url = 'https://rpc-testnet.lachain.io'
 PRIVATE_KEY_STR = "0xd95d6db65f3e2223703c5d8e205d98e3e6b470f067b0f94f6c6bf73d4301ce48"
@@ -47,12 +35,6 @@ def send_api_request(params , method):
 def get_chain_id():
     return int(send_api_request([], "eth_chainId"), 16)
 
-
-from eth_account._utils.legacy_transactions import ALLOWED_TRANSACTION_KEYS
-from eth_account._utils.signing import extract_chain_id, to_standard_v
-from eth_account._utils.legacy_transactions import serializable_unsigned_transaction_from_dict
-
-import web3
 w3 = web3.Web3(web3.HTTPProvider('https://rpc-testnet.lachain.io'))
 
 if __name__ == "__main__":    
