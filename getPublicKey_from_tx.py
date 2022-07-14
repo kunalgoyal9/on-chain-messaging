@@ -6,6 +6,7 @@ import web3
 
 url = 'https://rpc-testnet.lachain.io'
 PRIVATE_KEY_STR = "0xd95d6db65f3e2223703c5d8e205d98e3e6b470f067b0f94f6c6bf73d4301ce48"
+FROM_ADDRESS = "0x6Bc32575ACb8754886dC283c2c8ac54B1Bd93195"
 
 session = requests.Session()
 
@@ -37,14 +38,10 @@ def get_chain_id():
 
 w3 = web3.Web3(web3.HTTPProvider('https://rpc-testnet.lachain.io'))
 
-if __name__ == "__main__":    
-    chain_id = get_chain_id()
-    
-    # 1. get transaction list for given address
-    
+def get_public_key_from_tx(txHash, chain_id):
     
     # 2. choose some tx from this list and request it with web3.eth.getTransaction
-    tx = w3.eth.getTransaction('0x4bbcb8d59b9be67508be65943c5a798efb2ae9c976a12c163558ae1787191dc7')
+    tx = w3.eth.getTransaction(txHash)
     
     # 3. compose valid signature from its r, s and v fields (convert v to [0..3] interval)
     s = w3.eth.account._keys.Signature(vrs=(
@@ -59,5 +56,17 @@ if __name__ == "__main__":
     tt['chainId']=chain_id
     
     ut = serializable_unsigned_transaction_from_dict(tt)
-    print("public key: ", s.recover_public_key_from_msg_hash(ut.hash()))
+    return s.recover_public_key_from_msg_hash(ut.hash())
+
+if __name__ == "__main__":    
+    chain_id = get_chain_id()
+    
+    # 1. get transaction list for given address
+    tx_response = requests.get("https://scan-test.lachain.io/api?module=account&action=txlist&address=" + FROM_ADDRESS + "&offset=10&page=10")
+    tx_response = tx_response.json()['result']
+    
+    for i in range(0,10):
+        pubKey = get_public_key_from_tx(tx_response[i]['hash'], chain_id)
+        print("tx hash: ", tx_response[i]['hash'])
+        print("public key: ", pubKey)
     
