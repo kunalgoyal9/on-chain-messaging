@@ -49,7 +49,7 @@ def get_public_key_from_tx(txHash, chain_id):
                                         w3.toInt(tx.r),
                                         w3.toInt(tx.s)
                                         ))
-                                        
+    
     # 4. use recover to recover public key from signature and tx hash
     tt = {k:tx[k] for k in ALLOWED_TRANSACTION_KEYS - {'chainId', 'data'}}
     tt['data']=tx.input
@@ -58,12 +58,16 @@ def get_public_key_from_tx(txHash, chain_id):
     ut = serializable_unsigned_transaction_from_dict(tt)
     return s.recover_public_key_from_msg_hash(ut.hash())
 
+def get_transactions_from_address(address):
+    tx_response = requests.get("https://scan-test.lachain.io/api?module=account&action=txlist&address=" + address + "&offset=10&page=10")
+    tx_response = tx_response.json()['result']
+    return tx_response
+
 if __name__ == "__main__":    
     chain_id = get_chain_id()
     
     # 1. get transaction list for given address
-    tx_response = requests.get("https://scan-test.lachain.io/api?module=account&action=txlist&address=" + FROM_ADDRESS + "&offset=10&page=10")
-    tx_response = tx_response.json()['result']
+    tx_response = get_transactions_from_address(FROM_ADDRESS)
     
     for i in range(0,10):
         pubKey = get_public_key_from_tx(tx_response[i]['hash'], chain_id)
