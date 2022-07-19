@@ -59,7 +59,7 @@ def get_public_key_from_tx(txHash, chain_id):
     return s.recover_public_key_from_msg_hash(ut.hash())
 
 def get_transactions_from_address(address):
-    tx_response = requests.get("https://scan-test.lachain.io/api?module=account&action=txlist&address=" + address + "&offset=10&page=10")
+    tx_response = requests.get("https://scan-test.lachain.io/api?module=account&action=txlist&address=" + address + "&offset=10&page=0")
     tx_response = tx_response.json()['result']
     return tx_response
 
