@@ -10,37 +10,37 @@ const nacl = require('tweetnacl');
 
 const ascii85 = require('ascii85');
 
-const signMessage = async ({ setError, message }) => {
-  try {
-    console.log({ message });
-    if (!window.ethereum)
-      throw new Error("No crypto wallet found. Please install it.");
+// const signMessage = async ({ setError, message }) => {
+//   try {
+//     console.log({ message });
+//     if (!window.ethereum)
+//       throw new Error("No crypto wallet found. Please install it.");
 
-    await window.ethereum.send("eth_requestAccounts");
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
-    console.log("Account:: ", await signer.getAddress());
+//     await window.ethereum.send("eth_requestAccounts");
+//     const provider = new ethers.providers.Web3Provider(window.ethereum);
+//     const signer = provider.getSigner();
+//     console.log("Account:: ", await signer.getAddress());
     
-    const signature = await signer.signMessage(message);
-    const address = await signer.getAddress();
+//     const signature = await signer.signMessage(message);
+//     const address = await signer.getAddress();
     
-    const publicKeyFromTxn = "3028ef11b54cdc264e16efa4aad4d8c23ec7b569ed15b69a385f58940fd6a66f";
-    const encryptionPublicKey = hex_to_base64(publicKeyFromTxn);
-    const encryptedData = encryptData(encryptionPublicKey, message);
+//     const publicKeyFromTxn = "3028ef11b54cdc264e16efa4aad4d8c23ec7b569ed15b69a385f58940fd6a66f";
+//     const encryptionPublicKey = hex_to_base64(publicKeyFromTxn);
+//     const encryptedData = encryptData(encryptionPublicKey, message);
 
-    console.log("decryptedMessage:: ", await window.ethereum.request({method: 'eth_decrypt', params: [encryptedData, address]
-    }));
+//     console.log("decryptedMessage:: ", await window.ethereum.request({method: 'eth_decrypt', params: [encryptedData, address]
+//     }));
 
 
-    return {
-      message,
-      signature,
-      address
-    };
-  } catch (err) {
-    setError(err.message);
-  }
-};
+//     return {
+//       message,
+//       signature,
+//       address
+//     };
+//   } catch (err) {
+//     setError(err.message);
+//   }
+// };
 
 const encryptMessage = async ({ setError, message }) => {
   try{
@@ -54,10 +54,6 @@ const encryptMessage = async ({ setError, message }) => {
     const address = "0x6Bc32575ACb8754886dC283c2c8ac54B1Bd93195";
     const encryptionPublicKey = hex_to_base64(publicKeyFromTxn);
     const encryptedData = encryptData(encryptionPublicKey, message);
-
-    console.log("decryptedMessage:: ", await window.ethereum.request({method: 'eth_decrypt', params: [encryptedData, address]
-    
-    }));
 
     return {
       message,
@@ -94,7 +90,7 @@ function hex_to_base64(msgHex){
   return msgBase64;
 }
 
-export default function SignMessage() {
+export default function EncryptMessage() {
   const resultBox = useRef();
   const [signatures, setSignatures] = useState([]);
   const [error, setError] = useState();

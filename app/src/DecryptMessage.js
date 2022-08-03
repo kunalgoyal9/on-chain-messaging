@@ -3,21 +3,29 @@ import { ethers } from "ethers";
 import ErrorMessage from "./ErrorMessage";
 import SuccessMessage from "./SuccessMessage";
 
-const verifyMessage = async ({ message, address, signature }) => {
+const decryptMessage = async ({ encryptedMessage}) => {
   try {
-    const signerAddr = await ethers.utils.verifyMessage(message, signature);
-    if (signerAddr !== address) {
-      return false;
-    }
+    
+    // const address = await window.web3.currentProvider;
+    const address = await window.ethereum.request({method: 'eth_accounts', params: []})
+    // const address = "0x6Bc32575ACb8754886dC283c2c8ac54B1Bd93195";
 
-    return true;
+    console.log("address: ", address[0]);
+    console.log("encrypted message: ", encryptedMessage);
+
+    const decryptedMessage = await window.ethereum.request({method: 'eth_decrypt', params: [encryptedMessage, address[0]]})
+
+    // const signerAddr = await ethers.utils.verifyMessage(message, signature);
+    
+    return decryptedMessage;
+
   } catch (err) {
     console.log(err);
-    return false;
+    return "Error";
   }
 };
 
-export default function VerifyMessage() {
+export default function DecryptMessage() {
   const [error, setError] = useState();
   const [successMsg, setSuccessMsg] = useState();
 
@@ -26,15 +34,15 @@ export default function VerifyMessage() {
     const data = new FormData(e.target);
     setSuccessMsg();
     setError();
-    const isValid = await verifyMessage({
+    const decryptedMessage = await decryptMessage({
       setError,
-      message: data.get("message"),
-      address: data.get("address"),
-      signature: data.get("signature")
+      encryptedMessage: data.get("message"),
+      // address: data.get("address"),
+      // signature: data.get("signature")
     });
 
-    if (isValid) {
-      setSuccessMsg("Signature is valid!");
+    if (decryptedMessage) {
+      setSuccessMsg(decryptedMessage);
     } else {
       setError("Invalid signature");
     }
@@ -45,7 +53,7 @@ export default function VerifyMessage() {
       <div className="credit-card w-full shadow-lg mx-auto rounded-xl bg-white">
         <main className="mt-4 p-4">
           <h1 className="text-xl font-semibold text-gray-700 text-center">
-            Verify signature
+          Decrypt Message
           </h1>
           <div className="">
             <div className="my-3">
@@ -54,25 +62,7 @@ export default function VerifyMessage() {
                 type="text"
                 name="message"
                 className="textarea w-full h-24 textarea-bordered focus:ring focus:outline-none"
-                placeholder="Message"
-              />
-            </div>
-            <div className="my-3">
-              <textarea
-                required
-                type="text"
-                name="signature"
-                className="textarea w-full h-24 textarea-bordered focus:ring focus:outline-none"
-                placeholder="Signature"
-              />
-            </div>
-            <div className="my-3">
-              <input
-                required
-                type="text"
-                name="address"
-                className="textarea w-full input input-bordered focus:ring focus:outline-none"
-                placeholder="Signer address"
+                placeholder="Encrypted Message"
               />
             </div>
           </div>
@@ -82,7 +72,7 @@ export default function VerifyMessage() {
             type="submit"
             className="btn btn-primary submit-button focus:ring focus:outline-none w-full"
           >
-            Verify signature
+            Decrypt Message
           </button>
         </footer>
         <div className="p-4 mt-4">
