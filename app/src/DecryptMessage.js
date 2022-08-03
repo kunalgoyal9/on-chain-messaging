@@ -6,9 +6,7 @@ import SuccessMessage from "./SuccessMessage";
 const decryptMessage = async ({ encryptedMessage}) => {
   try {
     
-    // const address = await window.web3.currentProvider;
     const address = await window.ethereum.request({method: 'eth_accounts', params: []})
-    // const address = "0x6Bc32575ACb8754886dC283c2c8ac54B1Bd93195";
 
     console.log("address: ", address[0]);
     console.log("encrypted message: ", encryptedMessage);
