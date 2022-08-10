@@ -7,7 +7,7 @@ import ethereum
 import time
 
 
-FEED_PRIVATE_KEY = bytes.fromhex('27a4efc920b24deb68f6376c1d4a8aee4dd1ab985247c8de6770be2890210baa')
+FEED_PRIVATE_KEY = bytes.fromhex('')
 CHAIN_ID = 226
 LOCALNET_NODE = 'http://127.0.0.1:7070'
 DEVNET_NODE = 'https://rpc-devnet.lachain.io'
@@ -61,9 +61,9 @@ class Wallet:
         return contract.functions.name().call()
     
 if __name__ == '__main__':
-    with open("PubKeyStore.abi", "r") as abifile:
+    with open("app/src/PubKeyStore.abi", "r") as abifile:
         abi = abifile.read()
-    with open("PubKeyStore.wasm", "rb") as wasmfile:
+    with open("app/src/PubKeyStore.wasm", "rb") as wasmfile:
         bytecode = bytes.hex(wasmfile.read())
 
     node = web3.Web3(web3.Web3.HTTPProvider(TESTNET_NODE))
@@ -72,3 +72,6 @@ if __name__ == '__main__':
     result = feed_wallet.deploy_contract(bytecode, abi)
     feed_wallet.update_nonce()
     print(result)
+
+# Contract -> LA testnet
+# 0xC58A32c5fa0c40D885BB2D19B6560d3212d6882F
