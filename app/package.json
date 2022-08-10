@@ -9,13 +9,15 @@
   "main": "src/index.js",
   "dependencies": {
     "@metamask/eth-sig-util": "^4.0.1",
+    "@truffle/hdwallet-provider": "^2.0.13",
     "ascii85": "^1.0.2",
     "ethers": "5.4.5",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-scripts": "4.0.0",
     "tweetnacl": "^1.0.3",
-    "tweetnacl-util": "^0.15.1"
+    "tweetnacl-util": "^0.15.1",
+    "web3": "^1.7.5"
   },
   "devDependencies": {
     "@babel/runtime": "7.13.8",

@@ -4,55 +4,67 @@ import ErrorMessage from "./ErrorMessage";
 import { encrypt } from '@metamask/eth-sig-util';
 const ethUtil = require('ethereumjs-util');
 const sigUtil = require('@metamask/eth-sig-util');
+import getWeb3 from './getWeb3.js';
+const web33 = require('web3');
+const {abi} = require('./PubKeyStore.json');
 
 const naclUtil = require('tweetnacl-util');
 const nacl = require('tweetnacl');
-
 const ascii85 = require('ascii85');
 
-// const signMessage = async ({ setError, message }) => {
-//   try {
-//     console.log({ message });
-//     if (!window.ethereum)
-//       throw new Error("No crypto wallet found. Please install it.");
+async function loadContract() {
+  let address = "0xC58A32c5fa0c40D885BB2D19B6560d3212d6882F"
+  var web3 = await getWeb3();
+  var contract = new web3.eth.Contract(abi, address);
+  return contract;
+}
 
-//     await window.ethereum.send("eth_requestAccounts");
-//     const provider = new ethers.providers.Web3Provider(window.ethereum);
-//     const signer = provider.getSigner();
-//     console.log("Account:: ", await signer.getAddress());
-    
-//     const signature = await signer.signMessage(message);
-//     const address = await signer.getAddress();
-    
-//     const publicKeyFromTxn = "3028ef11b54cdc264e16efa4aad4d8c23ec7b569ed15b69a385f58940fd6a66f";
-//     const encryptionPublicKey = hex_to_base64(publicKeyFromTxn);
-//     const encryptedData = encryptData(encryptionPublicKey, message);
+const registerPublicKey = async ({setError}) => {
+  try{
+    // Getting address from metamask
+    let web3 = await getWeb3();
+    const address = (await web3.eth.getAccounts())[0];
+    console.log("address", address);
 
-//     console.log("decryptedMessage:: ", await window.ethereum.request({method: 'eth_decrypt', params: [encryptedData, address]
-//     }));
+    // Getting public key from metamask
+    const publicKey = await window.ethereum.request({method: 'eth_getEncryptionPublicKey', params: [address]});
 
-
-//     return {
-//       message,
-//       signature,
-//       address
-//     };
-//   } catch (err) {
-//     setError(err.message);
-//   }
-// };
+    let myContract = await loadContract();
+    await myContract.methods.registerMyPublicKey(publicKey).send({from: address});
+  }
+  catch(err){
+    setError(err.message);
+  }
+}
 
 const encryptMessage = async ({ setError, message }) => {
   try{
-    console.log({ message });
     if (!window.ethereum)
       throw new Error("No crypto wallet found. Please install it.");
     
     await window.ethereum.send("eth_requestAccounts");
+    
+    // Getting address from metamask
+    let web3 = await getWeb3();
+    const address = (await web3.eth.getAccounts())[0];
+    console.log("address", address);
 
-    const publicKeyFromTxn = "3028ef11b54cdc264e16efa4aad4d8c23ec7b569ed15b69a385f58940fd6a66f";
-    const address = "0x6Bc32575ACb8754886dC283c2c8ac54B1Bd93195";
+    // Getting public key from contract
+    let myContract = await loadContract();
+    const pubKeyFromContract = await myContract.methods.getPublicKeyForAddress(address).call();
+    console.log("pubKeyFromContract", pubKeyFromContract);
+
+    if(pubKeyFromContract == "Doesn't exist"){
+      console.log("ask Receiver to register Public key");
+    }
+    else{
+      // const publicKeyFromTxn = "3028ef11b54cdc264e16efa4aad4d8c23ec7b569ed15b69a385f58940fd6a66f";
+      console.log("Encrypting message:: ", message);  
+    }
+    
     const encryptionPublicKey = hex_to_base64(publicKeyFromTxn);
+
+    console.log("publickey base64: ", encryptionPublicKey);
     const encryptedData = encryptData(encryptionPublicKey, message);
 
     return {
