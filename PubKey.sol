@@ -17,7 +17,7 @@ contract PubKeyStore {
         pubkeyMap[sender].isThere = true;
     }
 
-    function getPublicKeyForAddress(string calldata add) public view returns (string memory){
+    function getPublicKeyForAddress(address add) public view returns (string memory){
         if(pubkeyMap[add].isThere){
             return pubkeyMap[add].public_key;
         }
