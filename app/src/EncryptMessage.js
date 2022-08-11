@@ -14,27 +14,8 @@ const ascii85 = require('ascii85');
 
 async function loadContract() {
   let address = "0xC58A32c5fa0c40D885BB2D19B6560d3212d6882F"
-  var web3 = await getWeb3();
-  var contract = new web3.eth.Contract(abi, address);
-  return contract;
-}
-
-const registerPublicKey = async ({setError}) => {
-  try{
-    // Getting address from metamask
-    let web3 = await getWeb3();
-    const address = (await web3.eth.getAccounts())[0];
-    console.log("address", address);
-
-    // Getting public key from metamask
-    const publicKey = await window.ethereum.request({method: 'eth_getEncryptionPublicKey', params: [address]});
-
-    let myContract = await loadContract();
-    await myContract.methods.registerMyPublicKey(publicKey).send({from: address});
-  }
-  catch(err){
-    setError(err.message);
-  }
+  let web3 = await getWeb3();
+  return new web3.eth.Contract(abi, address);
 }
 
 const encryptMessage = async ({ setError, message }) => {
@@ -55,23 +36,19 @@ const encryptMessage = async ({ setError, message }) => {
     console.log("pubKeyFromContract", pubKeyFromContract);
 
     if(pubKeyFromContract == "Doesn't exist"){
-      console.log("ask Receiver to register Public key");
+      setError("ask Receiver to register Public key");
     }
     else{
       // const publicKeyFromTxn = "3028ef11b54cdc264e16efa4aad4d8c23ec7b569ed15b69a385f58940fd6a66f";
       console.log("Encrypting message:: ", message);  
+      console.log("publickey base64: ", pubKeyFromContract);
+      const encryptedData = encryptData(pubKeyFromContract, message);
+      return {
+        message,
+        encryptedData,
+        address
+      };
     }
-    
-    const encryptionPublicKey = hex_to_base64(publicKeyFromTxn);
-
-    console.log("publickey base64: ", encryptionPublicKey);
-    const encryptedData = encryptData(encryptionPublicKey, message);
-
-    return {
-      message,
-      encryptedData,
-      address
-    };
     
   }
   catch(err){
