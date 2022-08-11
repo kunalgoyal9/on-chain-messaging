@@ -1,5 +1,7 @@
 import EncryptMessage from "./EncryptMessage";
 import DecryptMessage from "./DecryptMessage";
+import RegisterPublicKey from "./RegisterPublicKey";
+
 
 export default function App() {
   return (
@@ -9,6 +11,9 @@ export default function App() {
       </div>
       <div className="w-full lg:w-1/2">
         <DecryptMessage />
+      </div>
+      <div className="h-full">
+        <RegisterPublicKey />
       </div>
     </div>
   );
